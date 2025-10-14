@@ -8,6 +8,8 @@ class CategorySerializer(serializers.ModelSerializer):
     
 class ProductSerializer(serializers.ModelSerializer):
     category_name = serializers.CharField(source = "category.name", read_only=True)
+    creator = serializers.StringRelatedField()
     class Meta:
         model = Product
-        fields = ['name', 'description', 'price', 'quantity', 'image', 'category', 'category_name', 'creator']
+        fields = ['id', 'name', 'description', 'price', 'quantity', 'image', 'category', 'category_name', 'creator']
+        read_only_fields = ['creator']
