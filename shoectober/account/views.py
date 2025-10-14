@@ -6,53 +6,22 @@ from django.contrib.auth.models import User
 from rest_framework.authtoken.models import Token
 from django.contrib.auth import authenticate
 from rest_framework.permissions import IsAuthenticated, AllowAny
-
+from .serializers import RegisterSerializer
+from rest_framework import generics
 # Create your views here.
 
+class RegisterView(generics.CreateAPIView):
+    queryset = User.objects.all()
+    serializer_class = RegisterSerializer
+    permission_classes = [AllowAny]
+
+    def create(self, request, *args, **kwargs):
+        response = super().create(request, *args, **kwargs)
+        response['message'] = 'You have registered successfully'
+        return response
+
 @api_view(['POST'])
-@permission_classes(['AllowAny'])
-def register_view(request):
-    username = request.data.get('username')
-    password = request.data.get('password')
-    email = request.data.get('email')
-
-
-    # Validation
-    if not username or not password:
-        return Response(
-            {'error': "Please provide a valid username and password"},
-            status= status.HTTP_400_BAD_REQUEST
-        )
-    
-    if User.objects.filter(username = username).exists():
-        return Response(
-            {'error': 'username already exists! Pick another one'},
-            status=status.HTTP_406_NOT_ACCEPTABLE
-        )
-    
-    if User.objects.filter(email=email).exists():
-        return Response(
-            {'error': 'Email already exists!'},
-            status = status.HTTP_406_NOT_ACCEPTABLE
-        )
-
-    # After successful validation, create the user
-    user = User.objects.create_user(username=username, password=password, email=email)
-
-    #Create a token for the created user
-    token = Token.objects.create(user=user)
-
-    return Response(
-        {
-            'token': token.key,
-            'user_id': user.id,
-            'user_name': user.username,
-            'message': "User created successfully"
-        },
-        status=status.HTTP_201_CREATED
-    )
-@api_view(['POST'])
-@permission_classes(['AllowAny'])
+@permission_classes([AllowAny])
 def login_view(request):
     username = request.data.get('username')
     password = request.data.get('password')
