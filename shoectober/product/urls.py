@@ -10,6 +10,4 @@ urlpatterns = [
     path("products/<int:pk>/delete/", views.ProductDestroyView.as_view(), name="product-delete"),
     path("category/", views.CategoryListView.as_view(), name="categories"),
 
-
-    
 ]
