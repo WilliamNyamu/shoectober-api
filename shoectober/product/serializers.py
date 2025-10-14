@@ -11,5 +11,6 @@ class ProductSerializer(serializers.ModelSerializer):
     creator = serializers.StringRelatedField()
     class Meta:
         model = Product
-        fields = ['id', 'name', 'description', 'price', 'quantity', 'image', 'category', 'category_name', 'creator']
-        read_only_fields = ['creator']
+        fields = ['id', 'name', 'description', 'price', 'quantity', 'image', 'category', 'category_name', 'creator', 'created_date', 'updated_date']
+        read_only_fields = ['creator','created_at', 'updated_at']
+        

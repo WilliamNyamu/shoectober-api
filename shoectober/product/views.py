@@ -22,12 +22,12 @@ class CategoryListView(ListAPIView):
 class ProductListView(ListAPIView):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.AllowAny]
 
 class ProductRetrieveView(RetrieveAPIView):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.AllowAny]
 
 class ProductCreateView(CreateAPIView):
     queryset = Product.objects.all()
@@ -45,6 +45,7 @@ class ProductUpdateView(UpdateAPIView):
     def update(self, request, *args, **kwargs):
         response = super().update(request, *args, **kwargs)
         response['message'] = 'Product updated successfully'
+        return response
 
 class ProductDestroyView(DestroyAPIView):
     queryset = Product.objects.all()
