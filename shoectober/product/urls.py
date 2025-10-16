@@ -17,5 +17,12 @@ urlpatterns = [
     path("products/<int:product_id>/reviews/", views.ReviewListView.as_view(), name="reviews"),
     path("products/<int:product_id>/reviews/create/", views.ReviewCreateView.as_view(), name="create-review"),
     path("products/<int:product_id>/reviews/<int:pk>/update/", views.ReviewUpdateView.as_view(), name="update-review"),
-    path("products/<int:product_id>/reviews/<int:pk>/delete/", views.ReviewDestroyView.as_view(), name="delete-review")
+    path("products/<int:product_id>/reviews/<int:pk>/delete/", views.ReviewDestroyView.as_view(), name="delete-review"),
+
+    # Wishlist CRUD urlpatterns
+    path("products/wishlist/", views.WishlistListView.as_view(), name="wishlist"),
+    path("products/wishlist/<int:pk>/", views.WishlistRetrieveView.as_view(), name="wishlist-retrieve"),
+    path("products/wishlist/create/", views.WishListCreateView.as_view(), name="create-wishlist"),
+    path("products/wishlist/<int:product_id>/update/<int:pk>/", views.WishListUpdateView.as_view(), name="wishlist-update"),
+    path("products/wishlist/<int:product_id>/delete/<int:pk>/", views.WishListDestroyView.as_view(), name="wishlist-delete")
 ]

@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from rest_framework.generics import ListAPIView, CreateAPIView, RetrieveAPIView, DestroyAPIView, UpdateAPIView
-from .serializers import ProductSerializer, CategorySerializer, ReviewSerializer
-from .models import Product, Category, Review
+from .serializers import ProductSerializer, CategorySerializer, ReviewSerializer, WishlistSerializer
+from .models import Product, Category, Review, Wishlist
 from rest_framework.response import Response
 from rest_framework import status
 from django.contrib.auth.models import User
@@ -10,7 +10,8 @@ from django.contrib.auth import authenticate
 from rest_framework.decorators import api_view, permission_classes
 from django.contrib.auth.mixins import LoginRequiredMixin
 from rest_framework import permissions
-from .permissions import IsCreatororReadOnly, IsAuthororReadOnly
+from .permissions import IsCreatororReadOnly, IsAuthororReadOnly, IsUserorReadOnly
+from django.shortcuts import get_object_or_404
 
 # Create your views here.
 class CategoryListView(ListAPIView):
@@ -72,7 +73,9 @@ class ReviewCreateView(CreateAPIView):
 
     def perform_create(self, serializer):
         product_id = self.kwargs.get('product_id')
-        product = Product.objects.get(id = product_id)
+        # product = Product.objects.get(id = product_id) # when we use this, and the object does not exist our program will crash and return a 500 error.
+        # # Use the get_object_or_404 django shortcut
+        product = get_object_or_404(Product, id=product_id)
         serializer.save(product = product, author = self.request.user)
 
 class ReviewUpdateView(UpdateAPIView):
@@ -98,5 +101,59 @@ class ReviewDestroyView(DestroyAPIView):
     def get_queryset(self):
         product_id = self.kwargs.get('product_id')
         queryset = Review.objects.filter(product__id = product_id)
+        return queryset
+
+class WishlistListView(ListAPIView):
+    serializer_class = WishlistSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        queryset = Wishlist.objects.filter(author = self.request.user)
+        return queryset
+
+class WishlistRetrieveView(RetrieveAPIView):
+    serializer_class = WishlistSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        queryset = Wishlist.objects.filter(author = self.request.user)
+        return queryset
+    
+class WishListCreateView(CreateAPIView):
+    serializer_class = WishlistSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def perform_create(self, serializer):
+        product_id = self.kwargs.get('product_id') # retrieve from the url
+        # product = Product.objects.get(id=product_id) # when we use this and the object does not exist our program will crush if no object is found and return 500
+        # # Use the get_object_or_404 instead
+        product = get_object_or_404(Product, id=product_id)
+
+        # Prevent duplicate wishlist entry
+        if Wishlist.objects.filter(user=self.request.user, product = product).exists():
+            return Response(
+                {
+                    'error': 'Product already in wishlist'
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        serializer.save(product = product, user = self.request.user)
+        
+class WishListUpdateView(UpdateAPIView):
+    serializer_class = WishlistSerializer
+    permission_classes = [permissions.IsAuthenticated, IsUserorReadOnly]
+
+    def get_queryset(self):
+        product_id = self.kwargs.get('product_id') # Retrieve the product id from the url
+        queryset = Wishlist.objects.filter(product__id = product_id) # filter the product by the queryset. This also checks whether the user is authenticated and implements the custom permission
+        return queryset
+
+class WishListDestroyView(DestroyAPIView):
+    serializer_class = WishlistSerializer
+    permission_classes = [permissions.IsAuthenticated, IsUserorReadOnly]
+
+    def get_queryset(self):
+        product_id = self.kwargs.get('product_id')
+        queryset = Wishlist.objects.filter(product__id = product_id)
         return queryset
     

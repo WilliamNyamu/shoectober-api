@@ -1,6 +1,6 @@
 from rest_framework import permissions
 
-
+# PRODUCT UPDATE/DELETE
 class IsCreatororReadOnly(permissions.BasePermission):
     """
     Custom permission to allow only the creator to edit or delete a product
@@ -12,6 +12,7 @@ class IsCreatororReadOnly(permissions.BasePermission):
         # If it is an UNSAFE method like POST, PATCH, DELETE etc, ensure this is enforced.
         return obj.creator == request.user
 
+# REVIEW UPDATE/DELETE
 class IsAuthororReadOnly(permissions.BasePermission):
     """
     Custom permission to allow only the review author to edit or delete a review
@@ -21,3 +22,12 @@ class IsAuthororReadOnly(permissions.BasePermission):
             return True
         
         return obj.author == request.user
+
+# WISHLIST UPDATE/DELETE 
+class IsUserorReadOnly(permissions.BasePermission):
+    """Custom permission to allow only the user to edit or delete a wishlist item"""
+    def has_object_permission(self, request, view, obj):
+        if request.method in permissions.SAFE_METHODS:
+            return True
+        
+        return obj.user == request.user

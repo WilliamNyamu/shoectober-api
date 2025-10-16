@@ -27,10 +27,28 @@ class Review(models.Model):
     product = models.ForeignKey(Product, related_name="product_reviews", on_delete=models.CASCADE)
     author = models.ForeignKey(User, related_name="author_reviews", on_delete=models.CASCADE)
     content = models.TextField()
+    rating = models.IntegerField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return f"{self.author} reviewed {self.product}"
     
+
+class Wishlist(models.Model):
+    product = models.ForeignKey(Product, related_name="wishlist_product", on_delete=models.CASCADE)
+    user = models.ForeignKey(User, related_name="user_wishlist", on_delete=models.CASCADE)
+    description = models.TextField(null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    # Super-enforcing duplicate prevention checks
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=['product', 'user'], name='unique_wishlist_item')
+        ]
+
+    def __str__(self):
+        return f"{self.user} added {self.product} to wishlist"
+
 
