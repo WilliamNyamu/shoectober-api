@@ -12,18 +12,36 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from rest_framework import permissions
 from .permissions import IsCreatororReadOnly, IsAuthororReadOnly, IsUserorReadOnly
 from django.shortcuts import get_object_or_404
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework import filters # for search purposes
 
 # Create your views here.
 class CategoryListView(ListAPIView):
-    queryset = Category.objects.all()
     serializer_class = CategorySerializer
     permission_classes = [permissions.AllowAny]
+
+    def get_queryset(self):
+        """Get the whole queryset or filter based on the name"""
+        queryset = Category.objects.all()
+        name_filter = self.request.query_params.get('name')
+        if name_filter is not None:
+            queryset = Category.objects.filter(name__icontains = name_filter)
+        return queryset
 
 # Product model views
 class ProductListView(ListAPIView):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
     permission_classes = [permissions.AllowAny]
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
+    filterset_fields = {
+        'name': ['icontains', 'iexact'],
+        'category': ['icontains', 'iexact'],
+        'price': ['lt', 'lte', 'gte']
+    }
+    search_fields = ['name', 'category']
+    ordering_fields = ['name', 'category']
+    ordering = ['name']
 
 class ProductRetrieveView(RetrieveAPIView):
     queryset = Product.objects.all()
@@ -106,6 +124,8 @@ class ReviewDestroyView(DestroyAPIView):
 class WishlistListView(ListAPIView):
     serializer_class = WishlistSerializer
     permission_classes = [permissions.IsAuthenticated]
+    filter_backends = [filters.SearchFilter]
+    search_fields = ['product']
 
     def get_queryset(self):
         queryset = Wishlist.objects.filter(author = self.request.user)
