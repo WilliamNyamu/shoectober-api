@@ -14,6 +14,7 @@ from .permissions import IsCreatororReadOnly, IsAuthororReadOnly, IsUserorReadOn
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters # for search purposes
+from rest_framework.pagination import PageNumberPagination
 
 # Create your views here.
 class CategoryListView(ListAPIView):
@@ -29,7 +30,13 @@ class CategoryListView(ListAPIView):
         return queryset
 
 # Product model views
+class ProductPagination(PageNumberPagination):
+    page_size = 10  # Number of items per page
+    page_size_query_param = 'page_size'  # Allow client to set page size
+    max_page_size = 100  # Maximum page size client can request
+
 class ProductListView(ListAPIView):
+    """Listing all products """
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
     permission_classes = [permissions.AllowAny]
@@ -42,6 +49,7 @@ class ProductListView(ListAPIView):
     search_fields = ['name', 'category']
     ordering_fields = ['name', 'category']
     ordering = ['name']
+    pagination_class = ProductPagination
 
 class ProductRetrieveView(RetrieveAPIView):
     queryset = Product.objects.all()
