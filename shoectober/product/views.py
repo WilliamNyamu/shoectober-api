@@ -128,7 +128,7 @@ class WishlistListView(ListAPIView):
     search_fields = ['product']
 
     def get_queryset(self):
-        queryset = Wishlist.objects.filter(author = self.request.user)
+        queryset = Wishlist.objects.filter(user = self.request.user)
         return queryset
 
 class WishlistRetrieveView(RetrieveAPIView):
@@ -136,7 +136,7 @@ class WishlistRetrieveView(RetrieveAPIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
-        queryset = Wishlist.objects.filter(author = self.request.user)
+        queryset = Wishlist.objects.filter(user = self.request.user)
         return queryset
     
 class WishListCreateView(CreateAPIView):
@@ -146,7 +146,7 @@ class WishListCreateView(CreateAPIView):
     def perform_create(self, serializer):
         product_id = self.kwargs.get('product_id') # retrieve from the url
         # product = Product.objects.get(id=product_id) # when we use this and the object does not exist our program will crush if no object is found and return 500
-        # # Use the get_object_or_404 instead
+        # Use the get_object_or_404 instead
         product = get_object_or_404(Product, id=product_id)
 
         # Prevent duplicate wishlist entry

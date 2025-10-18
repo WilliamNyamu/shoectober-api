@@ -24,16 +24,22 @@ class ReviewSerializer(serializers.ModelSerializer):
         read_only_fields = ['created_at', 'updated_at']
 
     def validate(self, attrs):
-        if attrs.get('rating') > 5 or attrs.get('rating') == 0:
+        # here, i got a TypeError when I didn't provide a rating, because the .get() can return None.
+        rating = attrs.get('rating')
+
+        if rating is None :
+             raise serializers.ValidationError("Rating is required")
+        if rating > 5 or rating == 0:
             raise serializers.ValidationError("Enter a value between 1 and 5")
         return attrs
 
 class WishlistSerializer(serializers.ModelSerializer):
     product = serializers.StringRelatedField()
     user = serializers.StringRelatedField()
+    product_creator = serializers.CharField(source="product.creator", read_only=True)
     class Meta:
         model = Wishlist
-        fields = ['id', 'product', 'user', 'description', 'created_at', 'updated_at']
+        fields = ['id', 'product', 'product_creator', 'user', 'description', 'created_at', 'updated_at']
         read_only_fields = ['created_at', 'updated_at']
     
     # Enforcing duplicate prevention checks

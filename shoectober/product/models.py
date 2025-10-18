@@ -27,7 +27,7 @@ class Review(models.Model):
     product = models.ForeignKey(Product, related_name="product_reviews", on_delete=models.CASCADE)
     author = models.ForeignKey(User, related_name="author_reviews", on_delete=models.CASCADE)
     content = models.TextField()
-    rating = models.IntegerField(blank=True, null=True)
+    rating = models.PositiveSmallIntegerField(blank=True, null=True) #using positive small integer field saves database space
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

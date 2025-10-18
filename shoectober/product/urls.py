@@ -22,7 +22,7 @@ urlpatterns = [
     # Wishlist CRUD urlpatterns
     path("products/wishlist/", views.WishlistListView.as_view(), name="wishlist"),
     path("products/wishlist/<int:pk>/", views.WishlistRetrieveView.as_view(), name="wishlist-retrieve"),
-    path("products/wishlist/create/", views.WishListCreateView.as_view(), name="create-wishlist"),
+    path("products/wishlist/<int:product_id>/create/", views.WishListCreateView.as_view(), name="create-wishlist"),
     path("products/wishlist/<int:product_id>/update/<int:pk>/", views.WishListUpdateView.as_view(), name="wishlist-update"),
     path("products/wishlist/<int:product_id>/delete/<int:pk>/", views.WishListDestroyView.as_view(), name="wishlist-delete")
 ]
