@@ -31,9 +31,9 @@ class CategoryListView(ListAPIView):
 
 # Product model views
 class ProductPagination(PageNumberPagination):
-    page_size = 10  # Number of items per page
-    page_size_query_param = 'page_size'  # Allow client to set page size
-    max_page_size = 100  # Maximum page size client can request
+    page_size = 10  # Number of products shown per page
+    page_size_query_param = 'page_size'  # Allow someone(the client) to set page size
+    max_page_size = 100  # the maximaum page size someone can request
 
 class ProductListView(ListAPIView):
     """Listing all products """
