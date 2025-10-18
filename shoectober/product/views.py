@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from rest_framework.generics import ListAPIView, CreateAPIView, RetrieveAPIView, DestroyAPIView, UpdateAPIView
-from .serializers import ProductSerializer, CategorySerializer, ReviewSerializer, WishlistSerializer
+from .serializers import ProductSerializer, CategorySerializer, ReviewSerializer, WishlistSerializer, PurchaseSerializer
 from .models import Product, Category, Review, Wishlist, Purchase
 from rest_framework.response import Response
 from rest_framework import status
@@ -178,3 +178,32 @@ class WishListDestroyView(DestroyAPIView):
         return queryset
     
 
+class PurchaseList(ListAPIView):
+    """List the purchases made by the authenticated user"""
+    serializer_class = PurchaseSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        queryset = Purchase.objects.filter(user = self.request.user)
+        return queryset
+
+
+class PurchaseCreate(CreateAPIView):
+    """Making a purchase of a particular product"""
+    queryset = Purchase.objects.all()
+    serializer_class = PurchaseSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    # Adding extra context so that the product can be properly validated in PurchaseSerializer
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        product_id = self.kwargs.get('product_id')
+        product = get_object_or_404(Product, id=product_id)
+        context['product'] = product
+        return context
+
+    # Perform create to serializer by automatically adding the product and the authenticated user
+    def perform_create(self, serializer):
+        product_id = self.kwargs.get('product_id')
+        product = get_object_or_404(Product, id=product_id)
+        serializer.save(product = product, user = self.request.user)

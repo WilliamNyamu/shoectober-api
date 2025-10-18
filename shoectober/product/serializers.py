@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from .models import Product, Category, Review, Wishlist, Purchase
+from django.db.models import F
 
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
@@ -54,16 +55,19 @@ class WishlistSerializer(serializers.ModelSerializer):
 
 
 class PurchaseSerializer(serializers.ModelSerializer):
-    product_name = serializers.StringRelatedField(source='category', read_only=True)
+    product_name = serializers.StringRelatedField(source='product', read_only=True)
     user_name = serializers.StringRelatedField(source='user', read_only=True)
     class Meta:
         model = Purchase
         fields = ['id', 'product', 'product_name', 'user', 'user_name', 'quantity', 'paid_amount', 'purchase_date']
-        read_only_fields = ['paid_amount,' 'purchase_date']
+        read_only_fields = ['product', 'user', 'paid_amount', 'purchase_date']
     
     def validate(self, attrs):
-        product = attrs.get('product')
+        product = self.context.get('product') # get it from the serializer context that we added in the views.py
         quantity = attrs.get('quantity')
+
+        if product is None:
+            raise serializers.ValidationError("Product not found")
 
         if product.quantity < quantity:
             raise serializers.ValidationError(f"Only {product.quantity} is available in stock. Reduce your purchase quantity")
@@ -75,8 +79,13 @@ class PurchaseSerializer(serializers.ModelSerializer):
 
         # calculate the total amount to be paid
         total_amount = product.price * quantity
-        # get the paid_amount and 
+        # get the paid_amount and assign it to the total amount
         validated_data['paid_amount'] = total_amount
-        return Purchase.objects.create(**validated_data)
+        purchase = Purchase.objects.create(**validated_data)
+        # update the database
+        Product.objects.filter(id=product.id).update(quantity = F('quantity') - quantity) # the F() prevents race conditions where two users might be accessing the same result syncronously at the same time
+
+        return purchase
+    
     
 
