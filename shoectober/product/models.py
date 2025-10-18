@@ -52,3 +52,13 @@ class Wishlist(models.Model):
         return f"{self.user} added {self.product} to wishlist"
 
 
+class Purchase(models.Model):
+    product = models.ForeignKey(Product, related_name="purchases", on_delete=models.CASCADE)
+    user = models.ForeignKey(User, related_name="purchases", on_delete=models.CASCADE)
+    quantity = models.PositiveSmallIntegerField()
+    paid_amount = models.DecimalField(max_digits=10, decimal_places=2)
+    purchase_date = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.user} purchased {self.quantity}x {self.product}"
+    

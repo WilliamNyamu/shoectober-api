@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from rest_framework.generics import ListAPIView, CreateAPIView, RetrieveAPIView, DestroyAPIView, UpdateAPIView
 from .serializers import ProductSerializer, CategorySerializer, ReviewSerializer, WishlistSerializer
-from .models import Product, Category, Review, Wishlist
+from .models import Product, Category, Review, Wishlist, Purchase
 from rest_framework.response import Response
 from rest_framework import status
 from django.contrib.auth.models import User
@@ -177,3 +177,4 @@ class WishListDestroyView(DestroyAPIView):
         queryset = Wishlist.objects.filter(product__id = product_id)
         return queryset
     
+
