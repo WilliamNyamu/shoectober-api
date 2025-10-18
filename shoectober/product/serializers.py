@@ -7,11 +7,12 @@ class CategorySerializer(serializers.ModelSerializer):
         fields = ['id', 'name']
     
 class ProductSerializer(serializers.ModelSerializer):
-    category = serializers.StringRelatedField()
+    category = serializers.PrimaryKeyRelatedField(queryset=Product.objects.all())
+    category_name = serializers.StringRelatedField(source='category', read_only=True)
     creator = serializers.StringRelatedField()
     class Meta:
         model = Product
-        fields = ['id', 'name', 'description', 'price', 'quantity', 'image', 'category', 'creator', 'created_date', 'updated_date']
+        fields = ['id', 'name', 'description', 'price', 'quantity', 'image', 'category', 'category_name', 'creator', 'created_date', 'updated_date']
         read_only_fields = ['creator','created_at', 'updated_at']
 
 class ReviewSerializer(serializers.ModelSerializer):

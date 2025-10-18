@@ -36,7 +36,7 @@ class ProductListView(ListAPIView):
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
     filterset_fields = {
         'name': ['icontains', 'iexact'],
-        'category': ['icontains', 'iexact'],
+        'category__name': ['icontains', 'iexact'], # since category is a foreign key, we use the double underscore notation to access its fields
         'price': ['lt', 'lte', 'gte']
     }
     search_fields = ['name', 'category']
