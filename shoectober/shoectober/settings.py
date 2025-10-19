@@ -101,15 +101,6 @@ DATABASES = {
     }
 }
 
-if os.environ.get("DB_NAME") and os.environ.get("DB_USER"):
-    DATABASES['default'] = {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': os.environ.get("DB_NAME"),
-        'USER': os.environ.get("DB_USER"),
-        'PASSWORD': os.environ.get("DB_PASSWORD"),
-        'HOST': os.environ.get('DB_HOST', '127.0.0.1'),
-        'PORT': os.environ.get("DB_PORT"),
-    }
 
 # If DATABASE_URL is provided (e.g., by Heroku), override default database using dj-database-url
 DATABASE_URL = os.environ.get('DATABASE_URL')
@@ -160,14 +151,13 @@ STATIC_URL = '/static/'
 # Enable GZip, caching
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
-# Security settings recommended for production
-SECURE_HSTS_SECONDS = int(os.environ.get('SECURE_HSTS_SECONDS', '0' if DEBUG else '31536000'))
-SECURE_HSTS_INCLUDE_SUBDOMAINS = os.environ.get('SECURE_HSTS_INCLUDE_SUBDOMAINS', 'True').lower() in ('1','true','yes','on')
-SECURE_HSTS_PRELOAD = os.environ.get('SECURE_HSTS_PRELOAD', 'True').lower() in ('1','true','yes','on')
-SECURE_SSL_REDIRECT = os.environ.get('SECURE_SSL_REDIRECT', 'False' if DEBUG else 'True').lower() in ('1','true','yes','on')
-SESSION_COOKIE_SECURE = os.environ.get('SESSION_COOKIE_SECURE', 'False' if DEBUG else 'True').lower() in ('1','true','yes','on')
-CSRF_COOKIE_SECURE = os.environ.get('CSRF_COOKIE_SECURE', 'False' if DEBUG else 'True').lower() in ('1','true','yes','on')
-SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+# Security Settings
+SECURE_BROWSER_XSS_FILTER = True
+X_FRAME_OPTIONS = 'DENY'
+SECURE_CONTENT_TYPE_NOSNIFF = True
+SECURE_SSL_REDIRECT = True
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
